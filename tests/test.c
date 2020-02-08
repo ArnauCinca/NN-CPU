@@ -44,7 +44,7 @@ int main(){
 	// Activation Function
 	printf("ActivationFunction sigmoid (a)\n");
 	struct ActivationFunction* af = sigmoid();
-	af->c(size,a,res);
+	af->act(size,a,res);
 	for(int i = 0; i<size; ++i){
 		printf("%x: %f ",i,res[i]);
 	}
@@ -55,8 +55,7 @@ int main(){
 	//Loss Function
 	printf("\nLossFunction mse (a,b)\n");
 	struct LossFunction* lf = mse();
-	 
-		printf("Loss: %f ",lf->c(size,a,b));
+	printf("Loss: %f ",lf->loss(size,a,b));
 	
 	
 	printf("\n");
@@ -111,11 +110,11 @@ int main(){
 	printf("\n");
 	printf("\nModel\n");
 	struct Model* m = model(x,lf,sgd());
-	for(int i = 0; i<1000; ++i){
+	for(int i = 1; i<=1000; ++i){
 		m->fit(m,0.1,1,input,output,10,1);
 		m->predict(m,1,&a, &res);
 		if(i%100 == 0){
-			printf("epoch %d: ", (i+100)*10);
+			printf("epoch %d: ", i*10);
 			for(int j = 0; j<x2->size; ++j){
 				printf("%d: %f ",j, res[j]);
 			}

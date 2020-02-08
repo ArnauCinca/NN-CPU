@@ -11,10 +11,7 @@ void to0(int size, double* a){
 }
 
 double dotProductTree(int i, int e, double* a, double* b){
-	if(i==e){
-		//printf("%f*%f+", a[i], b[i] ); //print dot product
-	    return a[i]*b[i];
-	}
+	if(i==e) return a[i]*b[i];
 	else{
 		int m = (i+e)/2;
 		return dotProductTree(i,m,a,b)+dotProductTree(m+1,e,a,b);
@@ -23,7 +20,7 @@ double dotProductTree(int i, int e, double* a, double* b){
 }
 
 double dotProduct(int size, double* a, double* b){
-	return dotProductTree(0,size,a,b);//0;
+	return dotProductTree(0,size,a,b);
 }
 
 
