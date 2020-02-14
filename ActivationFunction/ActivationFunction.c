@@ -1,52 +1,57 @@
 #include "ActivationFunction.h"
+#include "../vectorOp/vectorOp.h"
 #include <math.h>
 #include <stdlib.h>
 
 void sigmoidAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = 1/(1+exp(-x[i]));
-  }
+  
+	multVal(size, x, -1, res);
+	map(size, exp, res, res);
+
+	for(int i = 0; i<size;++i){
+		res[i] = 1/(1+res[i]);
+	}
 }
 void sigmoidPAct(int size, double* x, double* res){
-  for(; size>0;--size){
-    res[size-1] = x[size-1]*(1-x[size-1]);
-  }
+	for(; size>0;--size){
+		res[size-1] = x[size-1]*(1-x[size-1]);
+	}
 }
 
 
 void ReLUAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = fmax(0.0,x[i]);
-  }
+	for(int i = 0; i<size;++i){
+		res[i] = fmax(0.0,x[i]);
+	}
 }
 void ReLUPAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = x[i]>0.0;
-  }
+	for(int i = 0; i<size;++i){
+		res[i] = x[i]>0.0;
+	}
 }
 
 
 void identityAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = x[i];
-  }
+	for(int i = 0; i<size;++i){
+		res[i] = x[i];
+	}
 }
 void identityPAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = 1;
-  }
+	for(int i = 0; i<size;++i){
+		res[i] = 1;
+	}
 }
 
 
 void tanhAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = (2/(1+exp(-2*x[i])))+1;
-  }
+	for(int i = 0; i<size;++i){
+		res[i] = (2/(1+exp(-2*x[i])))+1;
+	}
 }
 void tanhPAct(int size, double* x, double* res){
-  for(int i = 0; i<size;++i){
-    res[i] = 1-x[i]*x[i];
-  }
+	for(int i = 0; i<size;++i){
+		res[i] = 1-x[i]*x[i];
+	}
 }
 
 

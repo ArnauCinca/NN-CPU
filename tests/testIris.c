@@ -15,7 +15,7 @@ int main(){
 	FILE *fp;
 	char buff[255];
     
-   	fp = fopen("iris.txt", "r");
+   	fp = fopen("tests/iris.txt", "r");
 	fscanf(fp, "%s", buff);
 	inSize = atoi(buff);
 	fscanf(fp, "%s", buff);

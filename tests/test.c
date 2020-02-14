@@ -114,7 +114,6 @@ int main(){
 		m->fit(m,0.1,1,input,output,10,1);
 		m->predict(m,1,&a, &res);
 		if(i%100 == 0){
-			printf("epoch %d: ", i*10);
 			for(int j = 0; j<x2->size; ++j){
 				printf("%d: %f ",j, res[j]);
 			}

@@ -15,7 +15,7 @@ int main(){
 	FILE *fp;
 	char buff[255];
     
-   	fp = fopen("oax.txt", "r");
+   	fp = fopen("tests/oax.txt", "r");
 	fscanf(fp, "%s", buff);
 	inSize = atoi(buff);
 	fscanf(fp, "%s", buff);

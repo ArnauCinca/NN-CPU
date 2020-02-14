@@ -49,6 +49,11 @@ void sumVal(int size, double* a, double b, double* out){
 	for(; size>0; --size) out[size-1] = a[size-1]+b;
 }
 
+void map(int size, double (*f) (double), double* x, double* out){
+	for(; size>0; --size) out[size-1] = f(x[size-1]);
+}
+
+
 double sumRng(int r1, int r2, double* a){
 	if(r1==r2) return a[r1];
 	else{
