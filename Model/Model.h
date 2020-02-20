@@ -3,8 +3,6 @@ typedef struct Model{
   Layer* firstLayer;
   LossFunction* loss;
   Optimizer* optimizer;
-  double** outs; //local
-  double** deltas; //local
   int maxLayerSize;
   void (*fit)(struct Model* me, double learningRate, int size, double** data, double** out, int epoch, int batchSize);
   void (*test)(struct Model* me, int size, double** data, double** out);

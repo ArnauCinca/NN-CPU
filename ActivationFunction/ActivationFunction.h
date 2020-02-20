@@ -1,7 +1,7 @@
 typedef struct ActivationFunction{
 	double* aux;
-	void (*act)(int size, double* x, double* res);
-	void (*actPrime)(int size, double* x, double* res);
+	void (*act)(double* x, double* res);
+	void (*actPrime)(double* x, double* res);
 } ActivationFunction;
 
 ActivationFunction* sigmoid();

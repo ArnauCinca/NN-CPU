@@ -14,6 +14,6 @@ void diviVal(int size, double* a, double b, double* out);
 void sum(int size, double* a, double* b, double* out);
 void sumVal(int size, double* a, double b, double* out);
 
-void map(int size, double (*f) (double), double* x, double* res);
+void map(int size, void (*f) (double*, double*), double* x, double* res);
 
 double sumRng(int r1, int r2, double* a);

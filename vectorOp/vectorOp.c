@@ -49,8 +49,8 @@ void sumVal(int size, double* a, double b, double* out){
 	for(; size>0; --size) out[size-1] = a[size-1]+b;
 }
 
-void map(int size, double (*f) (double), double* x, double* out){
-	for(; size>0; --size) out[size-1] = f(x[size-1]);
+void map(int size, void (*f) (double*, double*), double* x, double* out){
+	for(; size>0; --size) f(&x[size-1],&out[size-1]);
 }
 
 

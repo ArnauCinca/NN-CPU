@@ -11,17 +11,17 @@ void OP_sgd(struct Layer* layer, struct LossFunction* loss, double lr,  double**
 	//deltas
 	//Output Layer
 	loss->lossPrime(l->size, outs[l->index], realOuts, deltas[l->index]);//loss	
-	l->act->actPrime(l->size, outs[l->index], tmp);//act
+	map(l->size, l->act->actPrime, outs[l->index], tmp);
 	mult(l->size, tmp, deltas[l->index], deltas[l->index]);// loss*act
 
 	l = l->prev;
 	//hidden Layers
 	while(l->prev != NULL){ //untill input layer
-		l->act->actPrime(l->size, outs[l->index] , tmp);//act
+		map(l->size, l->act->actPrime, outs[l->index], tmp);
 		for(int i = 0; i<l->size; ++i){
 			deltas[l->index][i] = 0;
 			for(int j = 0; j < l->next->size; ++j){
-				deltas[l->index][i] += deltas[l->index+1][j]* l->next->weights[j][i];//backprop
+				deltas[l->index][i] += deltas[l->index+1][j] * l->next->weights[j][i];//backprop
 			}
 			deltas[l->index][i] *= tmp[i];  //mult
 		}

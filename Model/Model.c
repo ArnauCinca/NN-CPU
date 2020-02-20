@@ -6,24 +6,41 @@
 
 
 void fit(struct Model* me, double learningRate, int size, double** data, double** out, int epoch, int batchSize){
-	double* tmp = malloc(me->maxLayerSize*sizeof(double));
-	double* tmp2 = malloc(me->maxLayerSize*sizeof(double));
-	int outSize = getLastLayer(me->firstLayer)->size;
-	double* realOuts = malloc(outSize*sizeof(double));
-	struct Layer* l;
-	double lr;
-	double loss;
+	//all variables needed-------------------------------------------
+	//batch
 	int batch;
 	double nBatch = (double)size/batchSize;
 	nBatch += (nBatch > (int)nBatch)?1:0;
 	nBatch = (double)(int)(nBatch); //rm decimal part
+	//outs & deltas
+	struct Layer* l;
+	l = getLastLayer(me->firstLayer);
+	int outSize = l->size;
+	int s = l->index+1;	
+    double** outs = malloc(s*sizeof(double*));
+    double** deltas = malloc(s*sizeof(double*));
+    l = me->firstLayer;
+    while(l != NULL){
+        outs[l->index] = malloc(l->size*sizeof(double));
+        deltas[l->index] = malloc(l->size*sizeof(double));
+        l = l->next;
+    }
+	
+	//tmps
+	double* tmp = malloc(me->maxLayerSize*sizeof(double));
+	double* tmp2 = malloc(me->maxLayerSize*sizeof(double));
+	double* realOuts = malloc(outSize*sizeof(double));
+	
+	double lr;
+	double loss;
+	//-----------------------------------------------------------------
 	for(int epo = 1; epo<=epoch; ++epo){
 		loss = 0;
 		lr = learningRate/epo;
 		for(int i = 0; i<size; i+=batchSize){
 			l = me->firstLayer;
 			while(l != NULL){
-				to0(l->size, me->outs[l->index]);
+				to0(l->size, outs[l->index]);
 				l = l->next;
 			}
 			for(int a = 0; a<outSize; ++a){
@@ -34,11 +51,11 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 				//input	
 				l = me->firstLayer;
 				l->forward(l,data[i+j],tmp);
-				sum(l->size, tmp, me->outs[0], me->outs[0]); //save the result for train
+				sum(l->size, tmp, outs[0], outs[0]); //save the result for train
 				l = l->next;
 				while(l != NULL){
 					l->forward(l, tmp, tmp2);  //forward layer
-					sum(l->size, tmp2, me->outs[l->index], me->outs[l->index]); //save the result for train
+					sum(l->size, tmp2, outs[l->index], outs[l->index]); //save the result for train
 					copy(l->size, tmp2, tmp);
 					l = l->next;
 				}
@@ -48,12 +65,12 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 			}
 			l = me->firstLayer;
 			while(l != NULL){	
-				diviVal(l->size,me->outs[l->index],batch,me->outs[l->index]);	
+				diviVal(l->size, outs[l->index], batch, outs[l->index]);	
 				l = l->next;
 			}
 			diviVal(outSize, realOuts, batch, realOuts);
-			me->optimizer->optimize(me->firstLayer, me->loss, lr, me->outs, realOuts, me->deltas, tmp);   //train
-			loss += me->loss->loss(outSize, me->outs[getLastLayer(me->firstLayer)->index], realOuts);
+			me->optimizer->optimize(me->firstLayer, me->loss, lr, outs, realOuts, deltas, tmp);   //train
+			loss += me->loss->loss(outSize, outs[getLastLayer(me->firstLayer)->index], realOuts);
 		}	
 		//PRINT MEAN EPOCH LOSS
 		printf("Epoch %d:  loss: %f\n", epo, loss/nBatch);
@@ -62,6 +79,14 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 	free(realOuts);
 	free(tmp2);
 	free(tmp);
+	l = me->firstLayer;
+    while(l != NULL){
+        free(outs[l->index]);
+        free(deltas[l->index]);
+        l = l->next;
+    }
+	free(deltas);
+	free(outs);
 }
 
 
@@ -126,23 +151,11 @@ Model* model(Layer* layer, LossFunction* loss, Optimizer* op){
 	m->firstLayer = getFirstLayer(layer);
 	m->loss = loss;
 	m->optimizer = op;
-	int size = 0;
 	struct Layer* l = m->firstLayer;
-	while(l != NULL){
-		size++;
-		l = l->next;
-	}
-	m->outs = malloc(size*sizeof(double*));
-	m->deltas = malloc(size*sizeof(double*));
-	int i = 0;
 	int max = 0;
-	l = m->firstLayer;
 	while(l != NULL){
-		m->outs[i] = malloc(l->size*sizeof(double));
-		m->deltas[i] = malloc(l->size*sizeof(double));
 		max = (max>l->size)?max:l->size;
 		l = l->next;
-		i++;
 	}
 	m->maxLayerSize = max;
 	m->fit = fit;

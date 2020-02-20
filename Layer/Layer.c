@@ -28,9 +28,9 @@ void denseForward(Layer* me, double* in, double* out){
 	int i = me->size;
 	int size = me->prev->size;
 	for(;i>0;--i) {
-		out[i-1] = dotProduct(size-1,in,me->weights[i-1]);+me->weights[i-1][size];  //dot product
+		out[i-1] = dotProduct(size-1, in, me->weights[i-1]) + me->weights[i-1][size];  //dot product
 	}
-	me->act->act(me->size,out,out); // activation Function
+	map(me->size, me->act->act, out, out); // activation Function
 }
 
 Layer* Input(int dim, int* kernel_shape){	

@@ -44,7 +44,7 @@ int main(){
 	// Activation Function
 	printf("ActivationFunction sigmoid (a)\n");
 	struct ActivationFunction* af = sigmoid();
-	af->act(size,a,res);
+	map(size, af->act, a,res);
 	for(int i = 0; i<size; ++i){
 		printf("%x: %f ",i,res[i]);
 	}
