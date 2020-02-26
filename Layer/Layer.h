@@ -1,13 +1,16 @@
 #include "../ActivationFunction/ActivationFunction.h"
+#include "../LossFunction/LossFunction.h"
 typedef struct Layer{
   struct Layer* prev;
   struct Layer* next;
   ActivationFunction* act;
-  int size;
   int dim;
-  int* kernel_shape;
+  int* shape; //0: layer size, 1: dim1, 2: dim2, ...
   double** weights;
   void (*forward)(struct Layer* me, double* input, double* res); 
+  void (*backprop)(struct Layer* me, double** outs, double** deltas, double* tmp); 
+  void (*backpropOutput)(struct Layer* me, double** outs, double** deltas, double* tmp, LossFunction* lf, double* realOuts); 
+  void (*gradientDescent)(struct Layer* me, double lr, double** outs, double** deltas); 
   int index;
 }Layer;
 

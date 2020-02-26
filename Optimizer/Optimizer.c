@@ -4,48 +4,32 @@
 #include <stdio.h>
 
 
-void OP_sgd(struct Layer* layer, struct LossFunction* loss, double lr,  double** outs, double* realOuts, double** deltas, double* tmp){
-	struct Layer* l;
-	l = getLastLayer(layer);
+void sgdOptimizer(struct Layer* l, struct LossFunction* loss, double lr,  double** outs, double* realOuts, double** deltas, double* tmp){
+	l = getLastLayer(l);
 	
-	//deltas
-	//Output Layer
-	loss->lossPrime(l->size, outs[l->index], realOuts, deltas[l->index]);//loss	
-	map(l->size, l->act->actPrime, outs[l->index], tmp);
-	mult(l->size, tmp, deltas[l->index], deltas[l->index]);// loss*act
-
+	//backprop output layer
+	l->backpropOutput(l, outs, deltas, tmp, loss, realOuts);
+	/*loss->lossPrime(l->shape[0], outs[l->index], realOuts, deltas[l->index]);//loss	
+	map(l->shape[0], l->act->actPrime, outs[l->index], tmp);
+	mult(l->shape[0], tmp, deltas[l->index], deltas[l->index]);// loss*actP
+*/
 	l = l->prev;
 	//hidden Layers
-	while(l->prev != NULL){ //untill input layer
-		map(l->size, l->act->actPrime, outs[l->index], tmp);
-		for(int i = 0; i<l->size; ++i){
-			deltas[l->index][i] = 0;
-			for(int j = 0; j < l->next->size; ++j){
-				deltas[l->index][i] += deltas[l->index+1][j] * l->next->weights[j][i];//backprop
-			}
-			deltas[l->index][i] *= tmp[i];  //mult
-		}
+	while(l->prev != NULL){ //backprop
+		l->backprop(l, outs, deltas, tmp);
 		l = l->prev;
 	}
-
 	//update weights
-	l = layer->next; //first layer before input layer
-	while (l != NULL){
-		//update
-		for (int i = 0; i< l->size; ++i){
-			for(int j = 0; j<l->prev->size; ++j){
-				l->weights[i][j] -= lr*deltas[l->index][i]*outs[l->index-1][j];//weights
-			}
-			l->weights[i][l->prev->size] -= lr*deltas[l->index][i]; //bias
-		}
-
+	l = l->next; //first layer before "input layer"
+	while (l != NULL){//gradientDescent
+		l->gradientDescent(l, lr, outs, deltas);
 		l = l->next;
 	}	
 }
 
 Optimizer* sgd(){
 	struct Optimizer* o = malloc(sizeof(Optimizer));
-	o->optimize = OP_sgd;
+	o->optimize = sgdOptimizer;
 	return o;
 
 

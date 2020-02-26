@@ -20,7 +20,7 @@ double dotProductTree(int i, int e, double* a, double* b){
 }
 
 double dotProduct(int size, double* a, double* b){
-	return dotProductTree(0,size,a,b);
+	return dotProductTree(0,size-1,a,b);
 }
 
 

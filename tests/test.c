@@ -21,7 +21,7 @@ int main(){
 		printf("%x: %f ",i,b[i]);
 	}
 	printf("\ndot product: ");
-	printf("%f",dotProduct(size,a,b));
+	printf("%f", dotProduct(size,a,b));
 	
 	double* res = malloc(size*sizeof(double));
 	printf("\nsum: ");
@@ -66,27 +66,27 @@ int main(){
 	struct Layer* in = Input(size,dim); // add srand in Input
 
 
-	int layer_size = 4;
+	int layer_size = 3;
 	printf("\nLayer1: (input: a)\n");
 	struct Layer* x = Dense(in,layer_size,sigmoid());
-	for(int i = 0; i<x->size; ++i){
+	for(int i = 0; i<x->shape[0]; ++i){
 		printf("Neuron %x\n", i);
-		for(int j = 0; j<x->prev->size+1; ++j){
+		for(int j = 0; j<x->prev->shape[0]+1; ++j){
 			printf("%x: %f ",j,x->weights[i][j]);
 		}
 		printf("\n");
 	}
 	x->forward(x,a,res);
 	printf("Out (sigmoid):\n");
-	for(int i = 0; i<x->size; ++i){
+	for(int i = 0; i<x->shape[0]; ++i){
 		printf("%x: %f ",i,res[i]);
 	}
 	printf("\n");
 	printf("\nLayer2: \n");
 	struct Layer* x2 = Dense(x,size,sigmoid());
-	for(int i = 0; i<x2->size; ++i){
+	for(int i = 0; i<x2->shape[0]; ++i){
 		printf("Neuron %x\n", i);
-		for(int j = 0; j<x2->prev->size+1; ++j){
+		for(int j = 0; j<x2->prev->shape[0]+1; ++j){
 			printf("%x: %f ",j,x2->weights[i][j]);
 		}
 		printf("\n");
@@ -95,7 +95,7 @@ int main(){
 	double* res2 = malloc(size*sizeof(double));
 	x2->forward(x2,res,res2);
 	printf("Out (sigmoid):\n");
-	for(int i = 0; i<x2->size; ++i){
+	for(int i = 0; i<x2->shape[0]; ++i){
 		printf("%x: %f ",i,res2[i]);
 	}
 	printf("\n");
@@ -114,7 +114,7 @@ int main(){
 		m->fit(m,0.1,1,input,output,10,1);
 		m->predict(m,1,&a, &res);
 		if(i%100 == 0){
-			for(int j = 0; j<x2->size; ++j){
+			for(int j = 0; j<x2->shape[0]; ++j){
 				printf("%d: %f ",j, res[j]);
 			}
 			printf("\n");
@@ -122,7 +122,7 @@ int main(){
 	}
 	
 	printf("objective: ");
-	for(int i = 0; i<x2->size; ++i){
+	for(int i = 0; i<x2->shape[0]; ++i){
 		printf("%x: %f ",i,b[i]);
 	}
 	printf("\n");

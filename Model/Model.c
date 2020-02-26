@@ -15,20 +15,28 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 	//outs & deltas
 	struct Layer* l;
 	l = getLastLayer(me->firstLayer);
-	int outSize = l->size;
+	int outSize = l->shape[0];
 	int s = l->index+1;	
     double** outs = malloc(s*sizeof(double*));
     double** deltas = malloc(s*sizeof(double*));
     l = me->firstLayer;
     while(l != NULL){
-        outs[l->index] = malloc(l->size*sizeof(double));
-        deltas[l->index] = malloc(l->size*sizeof(double));
+        outs[l->index] = malloc(l->shape[0]*sizeof(double));
+        deltas[l->index] = malloc(l->shape[0]*sizeof(double));
         l = l->next;
     }
 	
 	//tmps
 	double* tmp = malloc(me->maxLayerSize*sizeof(double));
 	double* tmp2 = malloc(me->maxLayerSize*sizeof(double));
+	/*
+	double** tmp = malloc(batchSize*sizeof(double*));
+	double** tmp2 = malloc(batchSize*sizeof(double*));
+	for(int i = 0; i<batchSize; ++i){
+		tmp[i] = malloc(me->maxLayerSize*sizeof(double));
+		tmp2[i] = malloc(me->maxLayerSize*sizeof(double));
+	}
+	*/
 	double* realOuts = malloc(outSize*sizeof(double));
 	
 	double lr;
@@ -40,23 +48,22 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 		for(int i = 0; i<size; i+=batchSize){
 			l = me->firstLayer;
 			while(l != NULL){
-				to0(l->size, outs[l->index]);
+				to0(l->shape[0], outs[l->index]);
 				l = l->next;
 			}
-			for(int a = 0; a<outSize; ++a){
-				realOuts[a] = 0; 
-			}
+			to0(outSize, realOuts);
+
 			batch = fmin(batchSize,size-i);
 			for(int j = 0; j < batch; ++j){
 				//input	
 				l = me->firstLayer;
-				l->forward(l,data[i+j],tmp);
-				sum(l->size, tmp, outs[0], outs[0]); //save the result for train
+				l->forward(l,data[i+j],tmp);  //copy & transpose TODO
+				sum(l->shape[0], tmp, outs[0], outs[0]); //save the result for train
 				l = l->next;
 				while(l != NULL){
 					l->forward(l, tmp, tmp2);  //forward layer
-					sum(l->size, tmp2, outs[l->index], outs[l->index]); //save the result for train
-					copy(l->size, tmp2, tmp);
+					sum(l->shape[0], tmp2, outs[l->index], outs[l->index]); //save the result for train
+					copy(l->shape[0], tmp2, tmp);
 					l = l->next;
 				}
 				for(int a = 0; a<outSize; ++a){
@@ -65,7 +72,7 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 			}
 			l = me->firstLayer;
 			while(l != NULL){	
-				diviVal(l->size, outs[l->index], batch, outs[l->index]);	
+				diviVal(l->shape[0], outs[l->index], batch, outs[l->index]);	
 				l = l->next;
 			}
 			diviVal(outSize, realOuts, batch, realOuts);
@@ -101,10 +108,10 @@ void test(struct Model* me, int size, double** data, double** out){
     	l = l->next;
     	while(l != NULL){
         	l->forward(l, tmp, tmp2);  //forward layer
-        	copy(l->size, tmp2, tmp);
+        	copy(l->shape[0], tmp2, tmp);
         	l = l->next;
     	}
-		loss += me->loss->loss(getLastLayer(me->firstLayer)->size, tmp, out[i]);
+		loss += me->loss->loss(getLastLayer(me->firstLayer)->shape[0], tmp, out[i]);
 	}
 	printf("Loss: %f\n", loss/size);
     free(tmp2);
@@ -123,8 +130,8 @@ void predict(struct Model* me, int size, double** data, double** res){
 	int s = 0;
     while(l != NULL){
     	l->forward(l, tmp, tmp2);  //forward layer
-        copy(l->size, tmp2, tmp);
-		s = l->size;//save size for copy the out to res
+        copy(l->shape[0], tmp2, tmp);
+		s = l->shape[0];//save size for copy the out to res
         l = l->next;
     }
 	copy(s,tmp,res[0]);
@@ -154,7 +161,7 @@ Model* model(Layer* layer, LossFunction* loss, Optimizer* op){
 	struct Layer* l = m->firstLayer;
 	int max = 0;
 	while(l != NULL){
-		max = (max>l->size)?max:l->size;
+		max = (max>l->shape[0])?max:l->shape[0];
 		l = l->next;
 	}
 	m->maxLayerSize = max;

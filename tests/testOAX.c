@@ -40,7 +40,7 @@ int main(){
 		}
 	}
 
-	struct Layer* in = Input(inSize, NULL);
+	struct Layer* in = Input(inSize, &inSize);
 
 	struct Layer* x = Dense(in,8,sigmoid());
 	x = Dense(x,4,sigmoid());

@@ -1,6 +1,7 @@
 all:
 	mkdir -p makes/
 	gcc -o makes/vectorOp.o -c vectorOp/vectorOp.c -O3
+	gcc -o makes/matrixOp.o -c matrixOp/matrixOp.c -O3
 	gcc -o makes/ActivationFunction.o -c ActivationFunction/ActivationFunction.c -O3
 	gcc -o makes/LossFunction.o -c LossFunction/LossFunction.c -O3
 	gcc -o makes/Layer.o -c Layer/Layer.c -O3
