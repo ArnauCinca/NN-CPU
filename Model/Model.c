@@ -63,8 +63,12 @@ void fit(struct Model* me, double learningRate, int size, double** data, double*
 				while(l != NULL){
 					l->forward(l, tmp, tmp2);  //forward layer
 					sum(l->shape[0], tmp2, outs[l->index], outs[l->index]); //save the result for train
-					copy(l->shape[0], tmp2, tmp);
 					l = l->next;
+					if(l != NULL){
+						l->forward(l,tmp2,tmp); //fordward
+						sum(l->shape[0], tmp, outs[l->index], outs[l->index]); //save the result for train
+						l = l->next;
+					}
 				}
 				for(int a = 0; a<outSize; ++a){
 					realOuts[a] += out[i+j][a]; 
