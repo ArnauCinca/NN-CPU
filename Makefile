@@ -7,7 +7,9 @@ all:
 	gcc -o makes/Layer.o -c Layer/Layer.c -O3
 	gcc -o makes/Optimizer.o -c Optimizer/Optimizer.c -O3
 	gcc -o makes/Model.o -c Model/Model.c -O3
-
+	rm -f test
+	rm -f testOAX
+	rm -f testIris
 test: tests/test.c
 	mkdir -p makes/tests
 	gcc -o makes/tests/test.o -c tests/test.c
