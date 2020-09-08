@@ -2,16 +2,15 @@
 #include "matrixOp.h"
 
 void matMultOp(int i, int j, int k, double** A, double** B, double** res){
-	//res[x][y] = A[x][0]*B[0][y]+ A[x][1]*B[1][y]+...+A[x][j-1]*B[j-1][y]
+	//i->batch, j->prev shape, k->shape, A->weight, B->in
 	for(int x = 0; x < i; ++x){
 		for(int y = 0; y < k; ++y){
-			res[y][x] = 0;//dotProduct(j, A[x], B[y]);
+			res[y][x] = 0;
 			for(int z = 0; z < j; ++z){//tree
-				res[y][x] += A[x][z] * B[y][z];  //transpose B 
+				res[x][y] += A[x][z] * B[z][y]; 
 			}
 		}
 	}
-
 }
 
 
@@ -22,6 +21,4 @@ void transposeOp(int i, int j, double** A,  double** res){
 			res[x][y] = A[y][x];
 		}
 	}
-
-
 }
