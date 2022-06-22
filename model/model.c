@@ -104,24 +104,28 @@ void predict(model_t *m, int size, double **input, double **res){
     layer_t *in = m->input;
     layer_t *out = m->output;
     layer_t *l = in;
-	double loss = 0;
-	int s = 0;
+    double ***outs = calloc(out->index - in->index, sizeof(double**));
 	for(int x = 0; x < out->index - in->index; x++){
-		s = (s > l->layer_size)? s: l->layer_size;
-		l->next;
+		outs[x] = calloc(size, sizeof(double*));
+		for(int y = 0; y < size; y++){
+			outs[x][y] = calloc(l->layer_size, sizeof(double));
+		}
+		fprintf(stderr, "l%d: %d", x, l->layer_size);
+		l=l->next;
 	}
-    double** tmp =  calloc(size, sizeof(double*));
-	for(int y = 0; y < size; y++){
-		tmp[y] = calloc(s, sizeof(double));
-	}
-	in->forward(in, size, input, tmp);
+	fprintf(stderr,"i:0\n");
+	in->forward(in, size, input, outs[0]);
 	l = in->next;
-	while(l != out){
-		l->forward(l, size, tmp, tmp);
+	int i = 1;
+	do{
+		fprintf(stderr,"i:%d\n", i);
+		l->forward(l, size, outs[i-1], outs[i]);
+		fprintf(stderr,"A\n");
 		l = l->next;
-	}
-	mat_copy(size, out->layer_size, tmp, res);
-    free(tmp);
+		i++;
+	}while(l != out);
+	mat_copy(size, out->layer_size, outs[i-1], res);
+    free(outs);
 }
 /*
 //TODO
@@ -148,8 +152,8 @@ model_t* model(layer_t *input, layer_t *output, loss_function_t *loss_fun, optim
 	m->optimizer = optim;
 
 	m->fit = fit;
-	//m->test = test;
-	//m->predict = predict;
+	m->test = test;
+	m->predict = predict;
 	//m->read = read;
 	//m->save = save;
 	return m;
