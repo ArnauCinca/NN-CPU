@@ -110,17 +110,13 @@ void predict(model_t *m, int size, double **input, double **res){
 		for(int y = 0; y < size; y++){
 			outs[x][y] = calloc(l->layer_size, sizeof(double));
 		}
-		fprintf(stderr, "l%d: %d", x, l->layer_size);
 		l=l->next;
 	}
-	fprintf(stderr,"i:0\n");
 	in->forward(in, size, input, outs[0]);
 	l = in->next;
 	int i = 1;
 	do{
-		fprintf(stderr,"i:%d\n", i);
 		l->forward(l, size, outs[i-1], outs[i]);
-		fprintf(stderr,"A\n");
 		l = l->next;
 		i++;
 	}while(l != out);
