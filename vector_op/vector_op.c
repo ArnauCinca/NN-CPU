@@ -1,4 +1,4 @@
-#include "vectorOp.h"
+#include "vector_op.h"
 #include <stdlib.h>
 
 #include <stdio.h>

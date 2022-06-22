@@ -1,12 +1,12 @@
 all:
 	mkdir -p makes/
-	gcc -o makes/vectorOp.o -c vectorOp/vectorOp.c -O3
-	gcc -o makes/matrixOp.o -c matrixOp/matrixOp.c -O3
-	gcc -o makes/ActivationFunction.o -c ActivationFunction/ActivationFunction.c -O3
-	gcc -o makes/LossFunction.o -c LossFunction/LossFunction.c -O3
-	gcc -o makes/Layer.o -c Layer/Layer.c -O3
-	gcc -o makes/Optimizer.o -c Optimizer/Optimizer.c -O3
-	gcc -o makes/Model.o -c Model/Model.c -O3
+	gcc -o makes/vector_op.o -c vector_op/vector_op.c -O3
+	gcc -o makes/matrix_op.o -c matrix_op/matrix_op.c -O3
+	gcc -o makes/activation_function.o -c activation_function/activation_function.c -O3
+	gcc -o makes/loss_function.o -c loss_function/loss_function.c -O3
+	gcc -o makes/layer.o -c layer/layer.c -O3
+	gcc -o makes/optimizer.o -c optimizer/optimizer.c -O3
+	gcc -o makes/model.o -c model/model.c -O3
 	rm -f test
 	rm -f testOAX
 	rm -f testIris
