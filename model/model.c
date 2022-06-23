@@ -6,30 +6,26 @@
 #include "../matrix_op/matrix_op.h"
 
 
-void fit(model_t* m, double learningRate, int size, double** data, double** out, int epoch, int batch){
-	//all variables needed-------------------------------------------
-	//batch
-	int batch_size;
-	//outs & deltas
-	//Outs= layers * (layer_size * batch)
-	layer_t *i = m->input;
-	layer_t *o = m->output;
-    double ***outs = calloc(o->index - i->index, sizeof(double**));
-    double ***delt = calloc(o->index - i->index, sizeof(double**));
-	layer_t *l = i;
-	for(int x = 0; x < o->index - i->index; x++){
+void fit(model_t* m, double learningRate, int size, double** data, double** res, int epoch, int batch){
+	layer_t *in = m->input;
+	layer_t *out = m->output;
+	double ***outs = calloc(out->index - in->index, sizeof(double**));
+	double ***delt = calloc(out->index - in->index, sizeof(double**));
+	layer_t *l = in;
+	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(batch, sizeof(double*));
 		delt[x] = calloc(batch, sizeof(double*));
 		for(int y = 0; y < batch; y++){
 			outs[x][y] = calloc(l->layer_size, sizeof(double));
 			delt[x][y] = calloc(l->layer_size, sizeof(double));
 		}
-		l->next;
+		l = l->next;
 	}
 
 
 	double lr;
 	double loss;
+	int batch_size;
 	//-----------------------------------------------------------------
 	for(int epo = 0; epo < epoch; epo++){
 		loss = 0;
@@ -38,22 +34,20 @@ void fit(model_t* m, double learningRate, int size, double** data, double** out,
 		for(int nb = 0; nb <= size/batch; nb++){
 			batch_size = fmin(batch,size - nb*batch);
 
-			i->forward(i, batch_size, &data[nb*batch], outs[0]);
-			l = i->next;
-			while(l != o){
-				l->forward(l, batch_size, outs[l->index-1], outs[l->index]);
+			in->forward(in, batch_size, &data[nb*batch], outs[0]);
+			l = in;
+		       	while(l != out){
 				l = l->next;
+				l->forward(l, batch_size, outs[l->index-1], outs[l->index]);
 			}
-			/*
 			for(int b = 0; b < batch_size; b++){
-				m->optimizer->optimize(m->firstLayer, m->loss, lr, outs, out[nb*batch][b], deltas, tmp);   //train
-				loss += me->loss->loss(outSize, outs[getLastLayer(me->firstLayer)->index], out[epo*batch]);
+				//m->optimizer->optimize(in, m->loss, lr);   //train
+				loss += m->loss_fun->loss(m->loss_fun, out->layer_size, outs[out->index][b], res[nb*batch + b]);
 			}
-			*/
 		}
 		//Backprop
 		//PRINT MEAN EPOCH LOSS
-		//printf("Epoch %d:  loss: %f\n", epo, loss/nBatch);
+		printf("Epoch %d:  loss: %f\n", epo, loss/size);
 	}
 /*
 	free(realOuts);
@@ -71,32 +65,29 @@ void fit(model_t* m, double learningRate, int size, double** data, double** out,
 }
 
 void test(model_t *m, int size, double **input, double **output){
-    layer_t *in = m->input;
-    layer_t *out = m->output;
-    layer_t *l = in;
-	double loss = 0;
-	int s = 0;
-	for(int x = 0; x < out->index - in->index; x++){
-		s = (s > l->layer_size)? s: l->layer_size;
-		l->next;
-	}
-    double** tmp =  calloc(size, sizeof(double*));
-	for(int y = 0; y < size; y++){
-		tmp[y] = calloc(s, sizeof(double));
-	}
-	in->forward(in, size, input, tmp);
-	l = in->next;
-	while(l != out){
-		l->forward(l, size, tmp, tmp);
+	layer_t *in = m->input;
+	layer_t *out = m->output;
+	layer_t *l = in;
+	double ***outs = calloc(out->index - in->index, sizeof(double**));
+	for(int x = 0; x <= out->index - in->index; x++){
+		outs[x] = calloc(size, sizeof(double*));
+		for(int y = 0; y < size; y++){
+			outs[x][y] = calloc(l->layer_size, sizeof(double));
+		}
 		l = l->next;
 	}
+	double loss = 0;
+	int s = 0;
+	in->forward(in, size, input, outs[0]);
+	l = in;
+	while(l != out){
+		l = l->next;
+		l->forward(l, size, outs[l->index -1], outs[l->index]);
+	}
 	for(int x = 0; x < size; x++){
-		loss += m->loss_fun->loss(out->layer_size, tmp[x], output[x]);
+		loss += m->loss_fun->loss(m->loss_fun, out->layer_size, outs[out->layer_size][x], output[x]);
 	}
 	printf("Loss: %f\n", loss/size);
-    free(tmp);
-
-
 
 }
 
@@ -105,7 +96,7 @@ void predict(model_t *m, int size, double **input, double **res){
     layer_t *out = m->output;
     layer_t *l = in;
     double ***outs = calloc(out->index - in->index, sizeof(double**));
-	for(int x = 0; x < out->index - in->index; x++){
+	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(size, sizeof(double*));
 		for(int y = 0; y < size; y++){
 			outs[x][y] = calloc(l->layer_size, sizeof(double));
@@ -113,14 +104,12 @@ void predict(model_t *m, int size, double **input, double **res){
 		l=l->next;
 	}
 	in->forward(in, size, input, outs[0]);
-	l = in->next;
-	int i = 1;
-	do{
-		l->forward(l, size, outs[i-1], outs[i]);
+	l = in;
+	while(l != out){
 		l = l->next;
-		i++;
-	}while(l != out);
-	mat_copy(size, out->layer_size, outs[i-1], res);
+		l->forward(l, size, outs[l->index-1], outs[l->index]);
+	}
+	mat_copy(size, out->layer_size, outs[out->index], res);
     free(outs);
 }
 /*

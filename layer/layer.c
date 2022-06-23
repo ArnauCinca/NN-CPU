@@ -43,7 +43,7 @@ void backpropagation_dense(layer_t *layer, int batch, double **outs, double **de
 void backpropagation_output_dense(layer_t *layer, int batch, double **outs, double **deltas, double *tmp, loss_function_t *loss, double **realOuts){
 	int size = layer->layer_size;
 	for(int b = 0; b < batch; b++){
-		loss->loss_prime(size, outs[b], realOuts[b], deltas[b]);//loss	
+		loss->loss_prime(loss, size, outs[b], realOuts[b], deltas[b]);//loss	
 		map(size, layer->act_fun->act_prime, outs[b], tmp);
 		mult(size, tmp, deltas[b], deltas[b]);// loss*actP
 	}

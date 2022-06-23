@@ -2,14 +2,14 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-double mse_loss(int size, double* yhat, double* y){
+double mse_loss(struct loss_function_t *loss, int size, double *yhat, double *y){
 	double res = 0;
   	for(int i = 0; i<size;++i){
-    	res += pow((yhat[i] - y[i]),2);
+	    	res += pow((yhat[i] - y[i]),2);
   	}
 	return res/size;
 }
-void mse_loss_prime(int size, double* yhat, double* y, double* res){
+void mse_loss_prime(struct loss_function_t *loss, int size, double *yhat, double *y, double *res){
 	for(int i = 0; i<size; ++i){
 		res[i] = yhat[i] - y[i];
 	}
