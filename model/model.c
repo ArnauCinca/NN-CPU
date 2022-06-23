@@ -9,8 +9,8 @@
 void fit(model_t* m, double learningRate, int size, double** data, double** res, int epoch, int batch){
 	layer_t *in = m->input;
 	layer_t *out = m->output;
-	double ***outs = calloc(out->index - in->index, sizeof(double**));
-	double ***delt = calloc(out->index - in->index, sizeof(double**));
+	double ***outs = calloc(out->index - in->index + 1, sizeof(double**));
+	double ***delt = calloc(out->index - in->index + 1, sizeof(double**));
 	layer_t *l = in;
 	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(batch, sizeof(double*));
@@ -68,7 +68,7 @@ void test(model_t *m, int size, double **input, double **output){
 	layer_t *in = m->input;
 	layer_t *out = m->output;
 	layer_t *l = in;
-	double ***outs = calloc(out->index - in->index, sizeof(double**));
+	double ***outs = calloc(out->index - in->index + 1, sizeof(double**));
 	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(size, sizeof(double*));
 		for(int y = 0; y < size; y++){
@@ -95,7 +95,7 @@ void predict(model_t *m, int size, double **input, double **res){
     layer_t *in = m->input;
     layer_t *out = m->output;
     layer_t *l = in;
-    double ***outs = calloc(out->index - in->index, sizeof(double**));
+    double ***outs = calloc(out->index - in->index + 1, sizeof(double**));
 	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(size, sizeof(double*));
 		for(int y = 0; y < size; y++){
