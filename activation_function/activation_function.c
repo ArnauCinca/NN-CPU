@@ -7,7 +7,7 @@ void sigmoid_act(double* x, double* res){
 	res[0] = 1/(1+exp(-x[0]));
 }
 void sigmoid_act_prime(double* x, double* res){
-	res[0] = x[0]*(1-x[0]);
+	res[0] = (1/(1+exp(-x[0])))*(1-(1/(1+exp(-x[0])))); //TODO: use f(x) not x
 }
 
 

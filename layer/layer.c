@@ -5,13 +5,13 @@
 #include <stdio.h>
 
 //INPUT
-void forward_input(layer_t *input, int batch, double **in, double **out){
-	mat_copy(batch, input->layer_size, in, out);
+void forward_input(layer_t *input, int batch, double **in, double **out, double **fout){
+	mat_copy(batch, input->layer_size, in, fout);
 }
 
 
 //DENSE
-void forward_dense(layer_t *layer, int batch, double **in, double **out){
+void forward_dense(layer_t *layer, int batch, double **in, double **out, double **fout){
 	//matMultOp(i,size,1, me->weights, &in, &out);
 	int size = layer->layer_size;
 	for(int b = 0; b < batch; b++){
@@ -19,14 +19,14 @@ void forward_dense(layer_t *layer, int batch, double **in, double **out){
 			out[b][i] = dotProduct(layer->prev->layer_size, in[b], layer->weights[i]);
 			out[b][i] += layer->weights[i][size];  //dot product
 		}
-		map(size, layer->act_fun->act, out[b], out[b]); // activation Function
+		map(size, layer->act_fun->act, out[b], fout[b]); // activation Function
 	}
 }
 
 
-void backpropagation_dense(layer_t *layer, int batch, double **outs, double **deltas, double **deltas_next, double *tmp){
+void backpropagation_dense(layer_t *layer, int batch, double **outs,  double **deltas, double **deltas_next){
 	int size = layer->layer_size;
-
+	double tmp[size];
 	for(int b = 0; b < batch; b++){
 		map(size, layer->act_fun->act_prime, outs[b], tmp);
     	for(int i = 0; i < size; i++){  //matmul
@@ -40,22 +40,23 @@ void backpropagation_dense(layer_t *layer, int batch, double **outs, double **de
 }
 
 
-void backpropagation_output_dense(layer_t *layer, int batch, double **outs, double **deltas, double *tmp, loss_function_t *loss, double **realOuts){
+void backpropagation_output_dense(layer_t *layer, int batch, double **outs, double **fouts, double **deltas, loss_function_t *loss, double **realOuts){
 	int size = layer->layer_size;
+	double tmp[size];
 	for(int b = 0; b < batch; b++){
-		loss->loss_prime(loss, size, outs[b], realOuts[b], deltas[b]);//loss	
-		map(size, layer->act_fun->act_prime, outs[b], tmp);
+		loss->loss_prime(loss, size, fouts[b], realOuts[b], deltas[b]);//loss	
+		map(size, layer->act_fun->act_prime, outs[b], tmp); //TODO:Reuse outs as they are not needed
 		mult(size, tmp, deltas[b], deltas[b]);// loss*actP
 	}
 }
 
-void gradient_descent_dense(layer_t *layer, int batch, double lr, double **outs_prev, double **outs, double **deltas){
+void gradient_descent_dense(layer_t *layer, int batch, double lr, double **fouts_prev, double **deltas){
 	for(int b = 0; b < batch; b++){
 		for (int i = 0; i < layer->layer_size; i++){
 			for(int j = 0; j < layer->prev->layer_size; j++){
-				layer->weights[i][j] -= lr * deltas[b][i]*outs_prev[b][j];//weights
+				layer->weights[i][j] -= lr * deltas[b][i]*fouts_prev[b][j];//weights
 			}
-			layer->weights[i][layer->prev->layer_size] -= lr*deltas[b][i]; //bias
+			layer->weights[i][layer->prev->layer_size] -= lr * deltas[b][i]; //bias
 		}
 	}
 }

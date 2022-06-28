@@ -19,10 +19,10 @@ typedef struct layer_t{
 
 
 
-	void (*forward)(struct layer_t *layer, int batch, double **input, double **res); 
-	void (*backpropagation)(struct layer_t *layer, int batch, double **outs, double **deltas, double **deltas_next, double *tmp); 
-	void (*backpropagation_output)(struct layer_t *layer, int batch,double **outs, double **deltas, double *tmp, loss_function_t *lf, double **realOuts); 
-	void (*gradient_descent)(struct layer_t *layer, int batch, double lr, double **outs_prev, double **outs, double **deltas); 
+	void (*forward)(struct layer_t *layer, int batch, double **in, double **out, double **fout); 
+	void (*backpropagation)(struct layer_t *layer, int batch, double **outs, double **deltas, double **deltas_next); 
+	void (*backpropagation_output)(struct layer_t *layer, int batch, double **outs, double **fouts, double **deltas, loss_function_t *lf, double **realOuts); 
+	void (*gradient_descent)(struct layer_t *layer, int batch, double lr, double **fouts_prev, double **deltas); 
 } layer_t;
 
 

@@ -10,10 +10,6 @@ all:
 	rm -f test
 	rm -f testOAX
 	rm -f testIris
-test: tests/test.c
-	mkdir -p makes/tests
-	gcc -o makes/tests/test.o -c tests/test.c
-	gcc makes/*.o makes/tests/test.o -o test -lm
 
 testOAX: tests/testOAX.c
 	mkdir -p makes/tests

@@ -4,22 +4,26 @@
 #include <stdio.h>
 
 
-void sgd_optimizer(layer_t *l, loss_function_t *loss, double lr, int batch, double ***outs, double **realOuts, double ***deltas, double *tmp){
-	
+void sgd_optimizer(layer_t *in, layer_t *out, loss_function_t *loss, double lr, int batch, double ***outs, double ***fouts, double **realOuts, double ***deltas){
+	layer_t *l = out;	
+//	printf("START\n");
 	//backprop output layer
-	l->backpropagation_output(l, batch, outs[l->index], deltas[l->index], tmp, loss, realOuts);
-	l = l->prev;
+	l->backpropagation_output(l, batch, outs[l->index], fouts[l->index], deltas[l->index], loss, realOuts);
+//	printf("backprop_out\n");
 	//hidden Layers
-	while(l->prev != NULL){ //backprop
-		l->backpropagation(l, batch, outs[l->index], deltas[l->index], deltas[l->next->index], tmp);
 		l = l->prev;
-	}
+	do{
+		l->backpropagation(l, batch, outs[l->index], deltas[l->index], deltas[l->next->index]);
+		l = l->prev;
+	} while(l != in); //backprop
+//	printf("backpropt\n");
 	//update weights
-	l = l->next; //first layer before "input layer"
-	while (l->prev != NULL){//gradientDescent
-		l->gradient_descent(l, batch, lr, outs[l->prev->index], outs[l->index], deltas[l->index]);
-		l = l->next;
-	}	
+
+	do{
+		l = l->next; //first layer before "input layer"
+		l->gradient_descent(l, batch, lr, fouts[l->prev->index], deltas[l->index]);
+	} while (l != out);//gradientDescent
+//	printf("END\n");
 }
 
 optimizer_t* sgd(){

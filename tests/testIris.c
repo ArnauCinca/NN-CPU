@@ -1,5 +1,5 @@
-#include "../Model/Model.h"
-#include "../vectorOp/vectorOp.h"
+#include "../model/model.h"
+#include "../vector_op/vector_op.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -40,18 +40,18 @@ int main(){
 		}
 	}
 
-	struct Layer* in = Input(inSize, NULL);
+	layer_t *in = InputDense(inSize);
 
-	struct Layer* x = Dense(in,1024,sigmoid());
-	x = Dense(x,512,sigmoid());
-	x = Dense(x,256,sigmoid());
-	x = Dense(x,128,sigmoid());
-	x = Dense(x,64,sigmoid());
-	x = Dense(x,32,sigmoid());
-	x = Dense(x,16,sigmoid());
-	x = Dense(x,outSize,sigmoid());
+	layer_t *x = Dense(1024,sigmoid(),in);
+	x = Dense(512,sigmoid(),x);
+	x = Dense(256,sigmoid(),x);
+	x = Dense(128,sigmoid(),x);
+	x = Dense(64,sigmoid(),x);
+	x = Dense(32,sigmoid(),x);
+	x = Dense(16,sigmoid(),x);
+	x = Dense(outSize,sigmoid(),x);
 
-	struct Model* m = model(x,mse(),sgd());
+	model_t *m = model(in, x, mse(), sgd());
 	
 
 	double* res = malloc(outSize*sizeof(double));
