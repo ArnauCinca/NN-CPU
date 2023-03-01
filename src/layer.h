@@ -1,5 +1,5 @@
-#include "../activation_function/activation_function.h"
-#include "../loss_function/loss_function.h"
+#include "activation_function.h"
+#include "loss_function.h"
 
 typedef struct layer_t{
 	struct layer_t *prev;

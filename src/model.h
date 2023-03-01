@@ -1,4 +1,4 @@
-#include "../optimizer/optimizer.h"
+#include "optimizer.h"
 typedef struct model_t{
   layer_t *input;
   layer_t *output;//TODO: need?

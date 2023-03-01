@@ -1,5 +1,5 @@
 #include "optimizer.h"
-#include "../vector_op/vector_op.h"
+#include "vector_op.h"
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -1,5 +1,5 @@
 #include "activation_function.h"
-#include "../vector_op/vector_op.h"
+#include "vector_op.h"
 #include <math.h>
 #include <stdlib.h>
 

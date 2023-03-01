@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
-#include "../vector_op/vector_op.h"
-#include "../matrix_op/matrix_op.h"
+#include "vector_op.h"
+#include "matrix_op.h"
 
 
 void fit(model_t* m, double learningRate, int size, double** data, double** res, int epoch, int batch){
