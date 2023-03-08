@@ -12,12 +12,22 @@ void forward_input(layer_t *input, int batch, double **in, double **out, double 
 
 //DENSE
 void forward_dense(layer_t *layer, int batch, double **in, double **out, double **fout){
-	//matMultOp(i,size,1, me->weights, &in, &out);
 	int size = layer->layer_size;
+	int prev_size = layer->prev->layer_size;
+
+	double weightT [prev_size][size];
+	//To pointer
+	double *wT[prev_size];
+	for(int i = 0; i < prev_size; i++) wT[i] = weightT[i];
+	//Transpose
+	mat_transpose(size, prev_size, layer->weights, wT);
+
+	//WEIGHTS
+	mat_mult(batch, prev_size, size, in, wT, out);
+	//BIAS & Activation Function
 	for(int b = 0; b < batch; b++){
-		for(int i = 0; i < size; i++) {
-			out[b][i] = dotProduct(layer->prev->layer_size, in[b], layer->weights[i]);
-			out[b][i] += layer->weights[i][size];  //dot product
+		for(int i = 0; i < size; i++) { //TODO: mv bias to weight matmul (add row w/ 1's at the end of the in)
+			out[b][i] += layer->weights[i][prev_size];
 		}
 		map(size, layer->act_fun->act, out[b], fout[b]); // activation Function
 	}
@@ -26,15 +36,15 @@ void forward_dense(layer_t *layer, int batch, double **in, double **out, double 
 
 void backpropagation_dense(layer_t *layer, int batch, double **outs,  double **deltas, double **deltas_next){
 	int size = layer->layer_size;
+	int next_size = layer->next->layer_size;
 	double tmp[size];
 	for(int b = 0; b < batch; b++){
 		map(size, layer->act_fun->act_prime, outs[b], tmp);
-    	for(int i = 0; i < size; i++){  //matmul
-    	   	deltas[b][i] = 0;
-			for(int j = 0; j < layer->next->layer_size; ++j){
-				deltas[b][i] += deltas_next[b][j] * layer->next->weights[j][i];
-			}
-		}
+	}
+
+	mat_mult(batch, next_size, size, deltas_next, layer->next->weights, deltas);
+
+	for(int b = 0; b < batch; b++){
 		mult(size,tmp,deltas[b],deltas[b]);
 	}
 }
@@ -51,12 +61,14 @@ void backpropagation_output_dense(layer_t *layer, int batch, double **outs, doub
 }
 
 void gradient_descent_dense(layer_t *layer, int batch, double lr, double **fouts_prev, double **deltas){
+	int size = layer->layer_size;
+	int prev_size = layer->prev->layer_size;
 	for(int b = 0; b < batch; b++){
-		for (int i = 0; i < layer->layer_size; i++){
-			for(int j = 0; j < layer->prev->layer_size; j++){
+		for (int i = 0; i < size; i++){
+			for(int j = 0; j < prev_size; j++){
 				layer->weights[i][j] -= lr * deltas[b][i]*fouts_prev[b][j];//weights
 			}
-			layer->weights[i][layer->prev->layer_size] -= lr * deltas[b][i]; //bias
+			layer->weights[i][prev_size] -= lr * deltas[b][i]; //bias
 		}
 	}
 }
@@ -96,14 +108,12 @@ layer_t* Dense(int layer_size, activation_function_t *act, layer_t *input){
 	l->layer_size = layer_size;
 
 	l->weights = calloc(layer_size,sizeof(double*));
-	for(int i = 0; i<layer_size; ++i){
+	for(int i = 0; i < layer_size; ++i){
 		l->weights[i] = calloc(input->layer_size + 1,sizeof(double));
 		randomInit(input->layer_size + 1, l->weights[i]);
 	}
    
 	l->act_fun = act;
-
-
 
 	l->forward = forward_dense;
 	l->backpropagation = backpropagation_dense;

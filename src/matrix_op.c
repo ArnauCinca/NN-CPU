@@ -19,12 +19,20 @@ void mat_mult(int x, int y, int z, double** A, double** B, double** res){
 	}
 }
 
+void mat_add(int x, int y, double** A, double** B, double** res){ //A[i][j] + B[i][j] = res[i][j]
+	for(int i = 0; i < x; i++){
+		for(int j = 0; j < y; j++){
+			res[i][j] = A[i][j] + B[i][j];
+		}
+	}
+}
+
 
 
 void mat_transpose(int x, int y, double** A,  double** res){
 	for(int i = 0; i < x; i++){
 		for(int j = 0; j < y; j++){
-			res[i][j] = A[j][y];
+			res[j][i] = A[i][j];
 		}
 	}
 }

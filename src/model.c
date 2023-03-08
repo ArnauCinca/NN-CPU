@@ -52,19 +52,19 @@ void fit(model_t* m, double learningRate, int size, double** data, double** res,
 		//PRINT MEAN EPOCH LOSS
 		printf("Epoch %d:  loss: %f\n", epo, loss/size);
 	}
-/*
+	/*
 	free(realOuts);
 	free(tmp2);
 	free(tmp);
 	l = me->firstLayer;
     while(l != NULL){
         free(outs[l->index]);
-        free(deltas[l->index]);
+        free(delt[l->index]);
         l = l->next;
     }
-	free(deltas);
-	free(outs);
 	*/
+	free(delt);
+	free(outs);
 }
 
 void test(model_t *m, int size, double **input, double **output){
