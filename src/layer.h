@@ -15,6 +15,7 @@ typedef struct layer_t{
 
 	
 	double** weights;
+	double** weightsT;
 	activation_function_t *act_fun;
 
 

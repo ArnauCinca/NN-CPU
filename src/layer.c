@@ -15,19 +15,13 @@ void forward_dense(layer_t *layer, int batch, double **in, double **out, double 
 	int size = layer->layer_size;
 	int prev_size = layer->prev->layer_size;
 
-	double weightT [prev_size][size];
-	//To pointer
-	double *wT[prev_size];
-	for(int i = 0; i < prev_size; i++) wT[i] = weightT[i];
-	//Transpose
-	mat_transpose(size, prev_size, layer->weights, wT);
 
 	//WEIGHTS
-	mat_mult(batch, prev_size, size, in, wT, out);
+	mat_mult(batch, prev_size, size, in, layer->weights, out);
 	//BIAS & Activation Function
 	for(int b = 0; b < batch; b++){
 		for(int i = 0; i < size; i++) { //TODO: mv bias to weight matmul (add row w/ 1's at the end of the in)
-			out[b][i] += layer->weights[i][prev_size];
+			out[b][i] += layer->weights[prev_size][i];
 		}
 		map(size, layer->act_fun->act, out[b], fout[b]); // activation Function
 	}
@@ -42,7 +36,9 @@ void backpropagation_dense(layer_t *layer, int batch, double **outs,  double **d
 		map(size, layer->act_fun->act_prime, outs[b], tmp);
 	}
 
-	mat_mult(batch, next_size, size, deltas_next, layer->next->weights, deltas);
+	mat_transpose(size+1, next_size, layer->next->weights, layer->next->weightsT);
+
+	mat_mult(batch, next_size, size, deltas_next, layer->next->weightsT, deltas);
 
 	for(int b = 0; b < batch; b++){
 		mult(size,tmp,deltas[b],deltas[b]);
@@ -66,9 +62,9 @@ void gradient_descent_dense(layer_t *layer, int batch, double lr, double **fouts
 	for(int b = 0; b < batch; b++){
 		for (int i = 0; i < size; i++){
 			for(int j = 0; j < prev_size; j++){
-				layer->weights[i][j] -= lr * deltas[b][i]*fouts_prev[b][j];//weights
+				layer->weights[j][i] -= lr * deltas[b][i]*fouts_prev[b][j];//weights
 			}
-			layer->weights[i][prev_size] -= lr * deltas[b][i]; //bias
+			layer->weights[prev_size][i] -= lr * deltas[b][i]; //bias
 		}
 	}
 }
@@ -107,10 +103,15 @@ layer_t* Dense(int layer_size, activation_function_t *act, layer_t *input){
 
 	l->layer_size = layer_size;
 
-	l->weights = calloc(layer_size,sizeof(double*));
+	l->weights = calloc(input->layer_size + 1,sizeof(double*));
+	for(int i = 0; i < input->layer_size + 1 ; ++i){
+		l->weights[i] = calloc(layer_size,sizeof(double));
+		randomInit(layer_size, l->weights[i]);
+	}
+	l->weightsT = calloc(layer_size,sizeof(double*));
 	for(int i = 0; i < layer_size; ++i){
-		l->weights[i] = calloc(input->layer_size + 1,sizeof(double));
-		randomInit(input->layer_size + 1, l->weights[i]);
+		l->weightsT[i] = calloc(input->layer_size + 1 ,sizeof(double));
+		randomInit(input->layer_size +1, l->weightsT[i]);
 	}
    
 	l->act_fun = act;
