@@ -19,7 +19,8 @@ void fit(model_t* m, double learningRate, int size, double** data, double** res,
 		delt[x]  = calloc(batch, sizeof(double*));
 		for(int y = 0; y < batch; y++){
 			outs[x][y]  = calloc(l->layer_size, sizeof(double));
-			fouts[x][y] = calloc(l->layer_size, sizeof(double));
+			fouts[x][y] = calloc(l->layer_size + 1, sizeof(double));
+			fouts[x][y][l->layer_size] = 1;
 			delt[x][y]  = calloc(l->layer_size, sizeof(double));
 		}
 		l = l->next;
@@ -76,7 +77,8 @@ void test(model_t *m, int size, double **input, double **output){
 	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(size, sizeof(double*));
 		for(int y = 0; y < size; y++){
-			outs[x][y] = calloc(l->layer_size, sizeof(double));
+			outs[x][y] = calloc(l->layer_size + 1, sizeof(double));
+			outs[x][y][l->layer_size] = 1;
 		}
 		if(l->layer_size > max_size) max_size = l->layer_size; 
 		l = l->next;
@@ -109,7 +111,8 @@ void predict(model_t *m, int size, double **input, double **res){
 	for(int x = 0; x <= out->index - in->index; x++){
 		outs[x] = calloc(size, sizeof(double*));
 		for(int y = 0; y < size; y++){
-			outs[x][y] = calloc(l->layer_size, sizeof(double));
+			outs[x][y] = calloc(l->layer_size +1 , sizeof(double));
+			outs[x][y][l->layer_size] = 1;
 		}
 		if(l->layer_size > max_size) max_size = l->layer_size; 
 		l=l->next;

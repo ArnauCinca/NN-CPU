@@ -16,13 +16,10 @@ void forward_dense(layer_t *layer, int batch, double **in, double **out, double 
 	int prev_size = layer->prev->layer_size;
 
 
-	//WEIGHTS
-	mat_mult(batch, prev_size, size, in, layer->weights, out);
-	//BIAS & Activation Function
+	//WEIGHTS & BIAS
+	mat_mult(batch, prev_size+1, size, in, layer->weights, out);
+	//Activation Function
 	for(int b = 0; b < batch; b++){
-		for(int i = 0; i < size; i++) { //TODO: mv bias to weight matmul (add row w/ 1's at the end of the in)
-			out[b][i] += layer->weights[prev_size][i];
-		}
 		map(size, layer->act_fun->act, out[b], fout[b]); // activation Function
 	}
 }
