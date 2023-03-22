@@ -13,7 +13,7 @@ typedef struct layer_t{
 	//int input_dim;
 	//int *input_shape; //0: dim1, 1: dim2, ...
 
-	
+	//TODO: Hypermatrix	
 	double** weights;
 	double** weightsT;
 	activation_function_t *act_fun;

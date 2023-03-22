@@ -1,5 +1,6 @@
 void randomInit(int size, double* a);
 void to0(int size, double* a);
+void to1(int size, double* a);
 
 double dotProduct(int size, double* a, double* b);
 

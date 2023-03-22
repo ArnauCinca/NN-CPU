@@ -9,6 +9,9 @@ void randomInit(int size, double* a){
 void to0(int size, double* a){
 	for(; size>0; --size) a[size-1] = 0;
 }
+void to1(int size, double* a){
+	for(; size>0; --size) a[size-1] = 1;
+}
 
 double dotProductTree(int i, int e, double* a, double* b){
 	if(i==e) return a[i]*b[i];

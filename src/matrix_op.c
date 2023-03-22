@@ -1,5 +1,12 @@
 #include <stdio.h>
+#include <math.h>
 #include "matrix_op.h"
+
+
+#define BS 32
+
+
+
 void mat_copy(int x, int y, double **m1, double **m2){
 	for(int i = 0; i < x; i++){
 		for(int j = 0; j < y; j++){
@@ -9,11 +16,31 @@ void mat_copy(int x, int y, double **m1, double **m2){
 }
 
 void mat_mult(int x, int y, int z, double** A, double** B, double** res){
-	for(int i = 0; i < x; i++){
-		for(int j = 0; j < z; j++){
-			res[i][j] = 0;
-			for(int k = 0; k < y; k++){
-				res[i][j] += A[i][k] * B[k][j]; 
+	int xx, yy, zz;
+
+	for(int ii = 0; ii < x; ii+=BS){
+		xx = fmin(ii+BS,x);
+		for(int jj = 0; jj < z; jj+=BS){
+			zz = fmin(jj+BS,z);
+
+
+			for(int i = ii; i < xx; i++){
+				for(int j = jj; j < zz; j++){
+					res[i][j] = A[i][0] * B[0][j]; 
+				}
+			}
+
+			for(int kk = 1; kk < y; kk+=BS){
+				yy = fmin(kk+BS,y);
+
+				for(int i = ii; i < xx; i++){
+					for(int j = jj; j < zz; j++){
+						for(int k = kk; k < yy; k++){
+							res[i][j] += A[i][k] * B[k][j]; 
+						}
+					}
+				}
+
 			}
 		}
 	}
