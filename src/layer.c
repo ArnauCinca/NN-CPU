@@ -58,10 +58,9 @@ void gradient_descent_dense(layer_t *layer, int batch, double lr, double **fouts
 	int prev_size = layer->prev->layer_size;
 	for(int b = 0; b < batch; b++){
 		for (int i = 0; i < size; i++){
-			for(int j = 0; j < prev_size; j++){
+			for(int j = 0; j <= prev_size; j++){
 				layer->weights[j][i] -= lr * deltas[b][i]*fouts_prev[b][j];//weights
 			}
-			layer->weights[prev_size][i] -= lr * deltas[b][i]; //bias
 		}
 	}
 }
